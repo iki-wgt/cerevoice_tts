@@ -1,6 +1,40 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(cerevoice_tts)
 
+if(EXISTS "$ENV{HOME}/cerevoice")
+  MESSAGE(STATUS "Setting location of CereVoice to $ENV{HOME}/cerevoice")
+  set(cerevoice_DIR $ENV{HOME}/cerevoice)
+elseif(EXISTS "$ENV{HOME}/CereVoice")
+  MESSAGE(STATUS "Setting location of CereVoice to $ENV{HOME}/CereVoice")
+  set(cerevoice_DIR $ENV{HOME}/CereVoice)
+elseif(EXISTS "$ENV{HOME}/Cerevoice")
+  MESSAGE(STATUS "Setting location of CereVoice to $ENV{HOME}/Cerevoice")
+  set(cerevoice_DIR $ENV{HOME}/Cerevoice)
+elseif(EXISTS "$ENV{HOME}/cereproc/cerevoice")
+  MESSAGE(STATUS "Setting location of CereVoice to $ENV{HOME}/cereproc/cerevoice")
+  set(cerevoice_DIR $ENV{HOME}/cereproc/cerevoice)
+elseif(EXISTS "$ENV{HOME}/cerevoice_sdk")
+  MESSAGE(STATUS "Setting location of CereVoice to $ENV{HOME}/cerevoice_sdk")
+  set(cerevoice_DIR $ENV{HOME}/cerevoice_sdk)
+elseif(EXISTS "/opt/cereproc/cerevoice")
+  MESSAGE(STATUS "Setting location of CereVoice to /opt/cereproc/cerevoice")
+  set(cerevoice_DIR /opt/cereproc/cerevoice)
+elseif(EXISTS "/opt/cerevoice")
+  MESSAGE(STATUS "Setting location of CereVoice to /opt/cerevoice")
+  set(cerevoice_DIR /opt/cerevoice)
+  # here you can add more locations
+else()
+  MESSAGE(SEND_ERROR "Can't find location of CereVoice! Modify the CMakeLists.txt to find your installation directory")
+endif()
+
+set(cerevoice_LIBS 
+  ${cerevoice_DIR}/cerevoice_eng/lib/libcerevoice_eng_shared.so
+  ${cerevoice_DIR}/cerevoice_aud/lib/libcerevoice_aud_shared.so
+  ${cerevoice_DIR}/cerevoice_pmod/lib/libcerevoice_pmod_shared.so
+  ${cerevoice_DIR}/cerehts/lib/libcerehts_shared.so
+  ${cerevoice_DIR}/cerevoice/lib/libcerevoice_shared.so
+)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -13,12 +47,6 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
-
-## Uncomment this if the package has a setup.py. This macro ensures
-## modules and global scripts declared therein get installed
-## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
-
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -29,9 +57,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+ INCLUDE_DIRS include
 #  LIBRARIES cerevoice_tts
-#  CATKIN_DEPENDS actionlib cerevoice_tts_msgs roscpp
+ CATKIN_DEPENDS actionlib cerevoice_tts_msgs roscpp
 #  DEPENDS system_lib
 )
 
@@ -44,24 +72,28 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${cerevoice_DIR}/cerevoice_eng/include
+  ${cerevoice_DIR}/cerevoice_aud/include
 )
 
 ## Declare a cpp library
-# add_library(cerevoice_tts
-#   src/${PROJECT_NAME}/cerevoice_tts.cpp
+#add_library(cerevoice_tts
+#  src/${PROJECT_NAME}/cerevoice_tts.cpp
 # )
 
 ## Declare a cpp executable
-# add_executable(cerevoice_tts_node src/cerevoice_tts_node.cpp)
+add_executable(cerevoice_tts_node src/cerevoice_tts_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(cerevoice_tts_node cerevoice_tts_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(cerevoice_tts_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(cerevoice_tts_node
+  ${catkin_LIBRARIES}
+  asound
+  ${cerevoice_LIBS}
+)
 
 #############
 ## Testing ##

@@ -11,8 +11,9 @@
   <url type="repository">http://141.69.58.11/ros/vocon_asr</url>
 
   <author >Benjamin Reiner</author>
-
-
+  
+  <!-- TODO: add somewhere the dependency to alsa -->
+  
   <test_depend>gtest</test_depend>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>actionlib</build_depend>
