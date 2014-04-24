@@ -36,9 +36,22 @@
 
 #include "ros/ros.h"
 
-int main(int argc, char **argv)
-{
-  ros::init(argc, argv, "tts_node");
+#include <cerevoice_aud.h>
 
-  return EXIT_SUCCESS;
+#include "cerevoice_tts/CerevoiceTts.h"
+
+namespace cerevoice_tts
+{
+
+CerevoiceTts::CerevoiceTts()
+{
+  engine_ = CPRCEN_engine_new();
+  ROS_ASSERT_MSG(engine_ != NULL, "CPRCEN_engine_new returned a NULL pointer");
 }
+
+CerevoiceTts::~CerevoiceTts()
+{
+  CPRCEN_engine_delete(engine_);
+}
+
+} /* namespace cerevoice_tts */

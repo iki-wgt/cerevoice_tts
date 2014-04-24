@@ -71,6 +71,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
   ${cerevoice_DIR}/cerevoice_eng/include
   ${cerevoice_DIR}/cerevoice_aud/include
@@ -98,12 +99,16 @@ target_link_libraries(cerevoice_tts_node
 #############
 ## Testing ##
 #############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_cerevoice_tts.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
+if(CATKIN_ENABLE_TESTING)
+  ## Add gtest based cpp test target and link libraries
+  catkin_add_gtest(${PROJECT_NAME}-test test/test_cerevoice_tts.cpp src/CerevoiceTts.cpp)
+  if(TARGET ${PROJECT_NAME}-test)
+    target_link_libraries(${PROJECT_NAME}-test 
+    ${catkin_LIBRARIES}
+    asound
+    ${cerevoice_LIBS})
+  endif()
+endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

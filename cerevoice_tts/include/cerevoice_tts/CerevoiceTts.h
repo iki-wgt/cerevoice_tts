@@ -34,11 +34,27 @@
 *     Author: Benjamin Reiner (reineben@hs-weingarten.de)
 *********************************************************************/
 
-#include "ros/ros.h"
+#ifndef CEREVOICETTS_H_
+#define CEREVOICETTS_H_
 
-int main(int argc, char **argv)
+#include <cerevoice_eng.h>
+
+namespace cerevoice_tts
 {
-  ros::init(argc, argv, "tts_node");
 
-  return EXIT_SUCCESS;
-}
+class CerevoiceTts
+{
+private:
+  /**
+   * Pointer to the CereVoice text-tp-speech engine.
+   */
+  CPRCEN_engine *engine_;
+
+public:
+  CerevoiceTts();
+  ~CerevoiceTts();
+};
+
+} /* namespace cerevoice_tts */
+
+#endif /* CEREVOICETTS_H_ */
