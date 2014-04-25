@@ -36,9 +36,13 @@
 
 #include "ros/ros.h"
 
+#include "cerevoice_tts/CerevoiceTts.h"
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "tts_node");
 
+  cerevoice_tts::CerevoiceTts tts;
+  tts.init();
   return EXIT_SUCCESS;
 }

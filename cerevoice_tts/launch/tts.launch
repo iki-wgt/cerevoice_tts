@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+  <rosparam param="voices" ns="cerevoice_tts_node" subst_value="true">
+  - path: $(env HOME)/cerevoice_sdk/voices/cerevoice_alex_3.0.6_22k.voice
+    license: $(env HOME)/cerevoice_sdk/voices/license.lic
+  - path: $(env HOME)/cerevoice_sdk/voices/cerevoice_gudrun_3.0.6_22k.voice
+    license: $(env HOME)/cerevoice_sdk/voices/license.lic
+  - path: $(env HOME)/cerevoice_sdk/voices/cerevoice_heather_3.0.8_22k.voice
+    license: $(env HOME)/cerevoice_sdk/voices/cereproc_license.lic
+  </rosparam>
+  <node name="cerevoice_tts_node" pkg="cerevoice_tts" type="cerevoice_tts_node" respawn="false" output="screen" />
+</launch>

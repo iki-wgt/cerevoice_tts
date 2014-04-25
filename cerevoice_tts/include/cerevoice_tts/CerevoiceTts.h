@@ -50,9 +50,34 @@ private:
    */
   CPRCEN_engine *engine_;
 
+  /**
+   * Handle to the synthesis channel.
+   */
+  CPRCEN_channel_handle channel_handle_;
+
+  /**
+   * @brief Callback function that is fired for every phrase returned by the synthesizer.
+   *
+   * The callback method is usefull for low latency speech output.
+   *
+   * @param audio_buffer Audio buffer with the synthesized phrase.
+   * @param user_data User defined data.
+   */
+  static void channelCallback(CPRC_abuf * audio_buffer, void * user_data);
+
 public:
   CerevoiceTts();
   ~CerevoiceTts();
+
+  /**
+   * @brief Initializes the TTS object.
+   *
+   * Fetches the voice and license files form the parameter server.
+   * Loads these voices. Creates a audio channel.
+   *
+   * @return True if successful, false otherwise.
+   */
+  bool init();
 };
 
 } /* namespace cerevoice_tts */

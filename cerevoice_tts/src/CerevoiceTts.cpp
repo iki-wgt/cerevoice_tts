@@ -35,6 +35,8 @@
 *********************************************************************/
 
 #include "ros/ros.h"
+#include "XmlRpcException.h"
+#include "XmlRpcValue.h"
 
 #include <cerevoice_aud.h>
 
@@ -43,7 +45,7 @@
 namespace cerevoice_tts
 {
 
-CerevoiceTts::CerevoiceTts()
+CerevoiceTts::CerevoiceTts() : channel_handle_(0)
 {
   engine_ = CPRCEN_engine_new();
   ROS_ASSERT_MSG(engine_ != NULL, "CPRCEN_engine_new returned a NULL pointer");
@@ -52,6 +54,57 @@ CerevoiceTts::CerevoiceTts()
 CerevoiceTts::~CerevoiceTts()
 {
   CPRCEN_engine_delete(engine_);
+}
+
+void CerevoiceTts::channelCallback(CPRC_abuf * audio_buffer, void * user_data)
+{
+
+}
+
+bool CerevoiceTts::init()
+{
+  ros::NodeHandle private_node_handle("~");
+
+  // parse rosparams
+  XmlRpc::XmlRpcValue xml_value;
+
+  private_node_handle.param("voices", xml_value, xml_value);
+
+  try
+  {
+    ROS_INFO("Found %d voices!", xml_value.size());
+
+    // The first voice should be the default voice. The default voice has to be added last.
+    // so iterate reversed
+    for (int i = xml_value.size() - 1; i >= 0; --i)
+    {
+      std::string path = xml_value[i]["path"];
+      std::string license = xml_value[i]["license"];
+
+      ROS_DEBUG("voice no. %d: %s", i + 1, path.c_str());
+      ROS_DEBUG("license no. %d: %s", i + 1, license.c_str());
+
+      if(path.empty())
+      {
+        ROS_ERROR("Empty voice path in list element %d!", i + 1);
+        return false;
+      }
+
+      if(license.empty())
+      {
+        ROS_ERROR("Empty license path in list element %d!", i + 1);
+        return false;
+      }
+    }
+  }
+  catch(XmlRpc::XmlRpcException &ex)
+  {
+    ROS_ERROR("Caught an XmlRpcException! Message: %s, Code: %d", ex.getMessage().c_str(), ex.getCode());
+    ROS_ERROR_COND(ex.getCode() == -1, "Have you forgot to specify a namespace in your launch file?");
+    return false;
+  }
+
+  return true;
 }
 
 } /* namespace cerevoice_tts */
