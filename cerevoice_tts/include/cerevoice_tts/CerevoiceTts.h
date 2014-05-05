@@ -47,6 +47,8 @@
 namespace cerevoice_tts
 {
 
+const int AUDIO_SLEEP_TIME = 50;
+
 class CerevoiceTts
 {
 private:
@@ -82,6 +84,8 @@ private:
    */
   static void channelCallback(CPRC_abuf * audio_buffer, void * user_data);
 
+  std::string constructXml(std::string text, std::string voice);
+
 public:
   CerevoiceTts();
   ~CerevoiceTts();
@@ -100,6 +104,8 @@ public:
    * Callback function for the action server.
    */
   void executeCB(const cerevoice_tts_msgs::TtsGoalConstPtr &goal);
+
+  void preemptCB();
 };
 
 } /* namespace cerevoice_tts */

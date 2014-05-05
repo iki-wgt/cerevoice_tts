@@ -52,10 +52,15 @@ CerevoiceTts::CerevoiceTts() : channel_handle_(0), player_(NULL),
 {
   engine_ = CPRCEN_engine_new();
   ROS_ASSERT_MSG(engine_ != NULL, "CPRCEN_engine_new returned a NULL pointer");
+
+  action_server_.registerPreemptCallback(boost::bind(&CerevoiceTts::preemptCB, this));
 }
 
 CerevoiceTts::~CerevoiceTts()
 {
+  if(player_ != NULL)
+    CPRC_sc_player_delete(player_);
+
   CPRCEN_engine_delete(engine_);
 }
 
@@ -167,12 +172,47 @@ bool CerevoiceTts::init()
     return false;
   }
 
+  // start the action server
+  action_server_.start();
+
   return true;
 }
 
 void CerevoiceTts::executeCB(const cerevoice_tts_msgs::TtsGoalConstPtr &goal)
 {
+  cerevoice_tts_msgs::TtsResult result;
+  std::string xml = constructXml(goal->text, goal->voice);
 
+  // synthesize the text
+  CPRCEN_engine_channel_speak(engine_, channel_handle_, xml.c_str(), xml.length(), 0);  // 0 = do not flush
+
+  // Finished processing, flush the buffer with empty input
+  CPRCEN_engine_channel_speak(engine_, channel_handle_, "", 0, 1);
+
+  // Wait till completion
+  while(CPRC_sc_audio_busy(player_))
+    CPRC_sc_sleep_msecs(AUDIO_SLEEP_TIME);
+
+  action_server_.setSucceeded(result);
+}
+
+void CerevoiceTts::preemptCB()
+{
+
+}
+
+std::string CerevoiceTts::constructXml(std::string text, std::string voice)
+{
+  std::string xml = "<?xml version=\"1.0\"?>\n"
+      "<speak version=\"1.1\" xmlns=\"http://www.w3.org/2001/10/synthesis\"\n"
+      " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+      " xsi:schemaLocation=\"http://www.w3.org/2001/10/synthesis\n"
+      "           http://www.w3.org/TR/speech-synthesis11/synthesis.xsd\">\n";
+  xml += "\n<voice name=\"" + voice + "\">\n";
+  xml += text;
+  xml += "\n</voice>";
+  xml += "\n</speak>";
+  return xml;
 }
 
 } /* namespace cerevoice_tts */
