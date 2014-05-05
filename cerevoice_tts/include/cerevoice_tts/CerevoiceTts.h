@@ -38,6 +38,11 @@
 #define CEREVOICETTS_H_
 
 #include <cerevoice_eng.h>
+#include <cerevoice_aud.h>
+
+#include <actionlib/server/simple_action_server.h>
+
+#include <cerevoice_tts_msgs/TtsAction.h>
 
 namespace cerevoice_tts
 {
@@ -56,12 +61,24 @@ private:
   CPRCEN_channel_handle channel_handle_;
 
   /**
+   * The audio player.
+   */
+  CPRC_sc_player *player_;
+
+  ros::NodeHandle node_handle_;
+
+  /**
+   * The action server.
+   */
+  actionlib::SimpleActionServer<cerevoice_tts_msgs::TtsAction> action_server_;
+
+  /**
    * @brief Callback function that is fired for every phrase returned by the synthesizer.
    *
    * The callback method is usefull for low latency speech output.
    *
    * @param audio_buffer Audio buffer with the synthesized phrase.
-   * @param user_data User defined data.
+   * @param user_data User defined data. The this pointer of the CerevoiceTts object is passed here.
    */
   static void channelCallback(CPRC_abuf * audio_buffer, void * user_data);
 
@@ -78,6 +95,11 @@ public:
    * @return True if successful, false otherwise.
    */
   bool init();
+
+  /**
+   * Callback function for the action server.
+   */
+  void executeCB(const cerevoice_tts_msgs::TtsGoalConstPtr &goal);
 };
 
 } /* namespace cerevoice_tts */

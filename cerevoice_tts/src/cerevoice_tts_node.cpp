@@ -44,5 +44,9 @@ int main(int argc, char **argv)
 
   cerevoice_tts::CerevoiceTts tts;
   tts.init();
+
+  ros::spin();
+
   return EXIT_SUCCESS;
 }
+

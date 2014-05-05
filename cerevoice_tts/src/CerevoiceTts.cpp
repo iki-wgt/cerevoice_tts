@@ -38,14 +38,17 @@
 #include "XmlRpcException.h"
 #include "XmlRpcValue.h"
 
-#include <cerevoice_aud.h>
-
 #include "cerevoice_tts/CerevoiceTts.h"
 
 namespace cerevoice_tts
 {
 
-CerevoiceTts::CerevoiceTts() : channel_handle_(0)
+CerevoiceTts::CerevoiceTts() : channel_handle_(0), player_(NULL),
+    action_server_(
+        node_handle_,
+        "TTS",
+        boost::bind(&CerevoiceTts::executeCB, this, _1),
+        false)
 {
   engine_ = CPRCEN_engine_new();
   ROS_ASSERT_MSG(engine_ != NULL, "CPRCEN_engine_new returned a NULL pointer");
@@ -58,12 +61,30 @@ CerevoiceTts::~CerevoiceTts()
 
 void CerevoiceTts::channelCallback(CPRC_abuf * audio_buffer, void * user_data)
 {
+  CerevoiceTts *tts_object = static_cast<CerevoiceTts *>(user_data);
 
+  // Transcription buffer, holds information on phone timings, markers etc.
+  const CPRC_abuf_trans * transcription_buffer = NULL;
+  CPRC_sc_audio * audio_sound_cue = NULL;
+  int wav_mk, wav_done;
+
+  wav_mk = CPRC_abuf_wav_mk(audio_buffer);
+  wav_done = CPRC_abuf_wav_done(audio_buffer);
+  if (wav_mk < 0) wav_mk = 0;
+  if (wav_done < 0) wav_done = 0;
+
+  if(tts_object->player_)
+  {
+    audio_sound_cue = CPRC_sc_audio_short_disposable(CPRC_abuf_wav_data(audio_buffer) + wav_mk, wav_done - wav_mk);
+    CPRC_sc_audio_cue(tts_object->player_, audio_sound_cue);
+  }
 }
 
 bool CerevoiceTts::init()
 {
   ros::NodeHandle private_node_handle("~");
+
+  bool success = true;
 
   // parse rosparams
   XmlRpc::XmlRpcValue xml_value;
@@ -95,6 +116,15 @@ bool CerevoiceTts::init()
         ROS_ERROR("Empty license path in list element %d!", i + 1);
         return false;
       }
+
+      // load this voice
+      success = CPRCEN_engine_load_voice(engine_, license.c_str(), NULL, path.c_str(), CPRC_VOICE_LOAD);
+      if(!success)
+      {
+        ROS_ERROR("Unable to load voice file %s!", path.c_str());
+        return false;
+      }
+      ROS_INFO("Loaded voice %s.", CPRCEN_engine_get_voice_info(engine_, i * -1 + xml_value.size() - 1, "VOICE_NAME"));
     }
   }
   catch(XmlRpc::XmlRpcException &ex)
@@ -104,7 +134,45 @@ bool CerevoiceTts::init()
     return false;
   }
 
+  // Open a synthesis channel
+  channel_handle_ = CPRCEN_engine_open_default_channel(engine_);
+  if(channel_handle_ == 0)
+  {
+    ROS_ERROR("Unable to open synthesis channel!");
+    return false;
+  }
+
+  std::string sample_rate_string = CPRCEN_channel_get_voice_info(engine_, channel_handle_, "SAMPLE_RATE");
+  if(sample_rate_string.empty())
+  {
+    ROS_ERROR("Unable to get sample rate of the channel!");
+    return false;
+  }
+
+  int sample_rate = atoi(sample_rate_string.c_str());
+
+  // create hte audio player
+  player_ = CPRC_sc_player_new(sample_rate);
+  if(player_ == NULL)
+  {
+    ROS_ERROR("Unable to create player with sample rate %d Hz!", sample_rate);
+    return false;
+  }
+
+  // set the callback
+  success = CPRCEN_engine_set_callback(engine_, channel_handle_, this, channelCallback);
+  if(!success)
+  {
+    ROS_ERROR("Unable to set callback function!");
+    return false;
+  }
+
   return true;
+}
+
+void CerevoiceTts::executeCB(const cerevoice_tts_msgs::TtsGoalConstPtr &goal)
+{
+
 }
 
 } /* namespace cerevoice_tts */
