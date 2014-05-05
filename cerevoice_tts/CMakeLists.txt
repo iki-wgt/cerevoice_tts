@@ -27,12 +27,13 @@ else()
   MESSAGE(SEND_ERROR "Can't find location of CereVoice! Modify the CMakeLists.txt to find your installation directory")
 endif()
 
-set(cerevoice_LIBS 
+set(cerevoice_LIBS
   ${cerevoice_DIR}/cerevoice_eng/lib/libcerevoice_eng_shared.so
-  ${cerevoice_DIR}/cerevoice_aud/lib/libcerevoice_aud_shared.so
   ${cerevoice_DIR}/cerevoice_pmod/lib/libcerevoice_pmod_shared.so
   ${cerevoice_DIR}/cerehts/lib/libcerehts_shared.so
   ${cerevoice_DIR}/cerevoice/lib/libcerevoice_shared.so
+  
+  ${cerevoice_DIR}/cerevoice_aud/lib/libcerevoice_aud_shared.so
 )
 
 ## Find catkin macros and libraries
@@ -92,8 +93,9 @@ add_executable(cerevoice_tts_node src/cerevoice_tts_node.cpp src/CerevoiceTts.cp
 ## Specify libraries to link a library or executable target against
 target_link_libraries(cerevoice_tts_node
   ${catkin_LIBRARIES}
-  asound
+  
   ${cerevoice_LIBS}
+  asound
 )
 
 #############
