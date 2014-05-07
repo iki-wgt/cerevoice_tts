@@ -160,7 +160,8 @@ bool CerevoiceTts::init()
 
   int sample_rate = atoi(sample_rate_string.c_str());
 
-  // create hte audio player
+  // create the audio player
+  ROS_INFO("Will now create the player. This may create messages from ALSA.");
   player_ = CPRC_sc_player_new(sample_rate);
   if(player_ == NULL)
   {
