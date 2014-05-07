@@ -43,7 +43,10 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "tts_node");
 
   cerevoice_tts::CerevoiceTts tts;
-  tts.init();
+  bool initialized = tts.init();
+
+  if(!initialized)
+    return EXIT_FAILURE;
 
   ros::spin();
 
