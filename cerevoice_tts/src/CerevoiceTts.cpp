@@ -83,6 +83,10 @@ void CerevoiceTts::channelCallback(CPRC_abuf * audio_buffer, void * user_data)
     audio_sound_cue = CPRC_sc_audio_short_disposable(CPRC_abuf_wav_data(audio_buffer) + wav_mk, wav_done - wav_mk);
     CPRC_sc_audio_cue(tts_object->player_, audio_sound_cue);
   }
+  else
+  {
+    ROS_ERROR("Can't play audio! Pointer to player is NULL!");
+  }
 }
 
 bool CerevoiceTts::init()
@@ -199,7 +203,16 @@ void CerevoiceTts::executeCB(const cerevoice_tts_msgs::TtsGoalConstPtr &goal)
 
 void CerevoiceTts::preemptCB()
 {
+  if(player_)
+  {
+    ROS_INFO("Aborting text synthesis.");
+    int ret = CPRC_sc_audio_stop(player_);
 
+    if(ret == 0)
+      ROS_ERROR("Player can't be stopped!");
+  }
+  else
+    ROS_ERROR("Player is NULL!");
 }
 
 std::string CerevoiceTts::constructXml(std::string text, std::string voice)
