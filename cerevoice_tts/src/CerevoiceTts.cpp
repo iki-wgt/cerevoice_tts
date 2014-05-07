@@ -210,6 +210,8 @@ void CerevoiceTts::preemptCB()
 
     if(ret == 0)
       ROS_ERROR("Player can't be stopped!");
+
+    action_server_.setPreempted();
   }
   else
     ROS_ERROR("Player is NULL!");
