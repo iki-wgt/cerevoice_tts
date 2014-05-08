@@ -190,23 +190,44 @@ void CerevoiceTts::executeCB(const cerevoice_tts_msgs::TtsGoalConstPtr &goal)
 
   ROS_INFO("Will now use voice %s synthesize the text: %s", goal->voice.c_str(), goal->text.c_str());
   // synthesize the text
-  CPRCEN_engine_channel_speak(engine_, channel_handle_, xml.c_str(), xml.length(), 0);  // 0 = do not flush
+  if(!CPRCEN_engine_channel_speak(engine_, channel_handle_, xml.c_str(), xml.length(), 0))  // 0 = do not flush
+  {
+    ROS_ERROR("The speak method returned an error!");
+    action_server_.setAborted();
+    return;
+  }
+
 
   // Finished processing, flush the buffer with empty input
-  CPRCEN_engine_channel_speak(engine_, channel_handle_, "", 0, 1);
+  if(!CPRCEN_engine_channel_speak(engine_, channel_handle_, "", 0, 1))
+  {
+    ROS_ERROR("The speak method returned an error!");
+    action_server_.setAborted();
+    return;
+  }
 
   // Wait till completion
   while(CPRC_sc_audio_busy(player_))
     CPRC_sc_sleep_msecs(AUDIO_SLEEP_TIME);
 
-  action_server_.setSucceeded(result);
+  if(action_server_.isActive())
+    action_server_.setSucceeded(result);
 }
 
 void CerevoiceTts::preemptCB()
 {
+  ROS_INFO("Aborting text synthesis.");
+
+  if(engine_)
+  {
+    if(!CPRCEN_engine_channel_reset(engine_, channel_handle_))  // Reset the channel, cancel processing of input
+      ROS_ERROR("Could not reset channel!");
+  }
+  else
+      ROS_ERROR("Engine is NULL!");
+
   if(player_)
   {
-    ROS_INFO("Aborting text synthesis.");
     int ret = CPRC_sc_audio_stop(player_);
 
     if(ret == 0)
