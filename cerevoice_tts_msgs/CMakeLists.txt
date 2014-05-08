@@ -23,5 +23,5 @@ generate_messages(
 )
 
 catkin_package(
- CATKIN_DEPENDS actionlib_msgs #message_generation std_msgs
+ CATKIN_DEPENDS actionlib_msgs message_runtime std_msgs #message_generation 
 )
