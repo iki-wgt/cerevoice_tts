@@ -35,7 +35,7 @@ There enter the name of the voice and the text.
 See the [ROS actionlib tutorial](http://wiki.ros.org/actionlib_tutorials/Tutorials/SimpleActionClient) for how to use actionlib.
 
 Create the action client with
-    actionlib::SimpleActionClient<cerevoice_tts_msgs::TtsAction> action_client("TTS", true);
+```actionlib::SimpleActionClient<cerevoice_tts_msgs::TtsAction> action_client("TTS", true);```
 
 Set the voice and the text in the action goal with
 
