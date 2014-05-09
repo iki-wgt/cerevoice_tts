@@ -46,24 +46,24 @@ goal.voice = "Heather";
 
 ## Launch file format
 Example:
-```
-<?xml version="1.0"?>
-<launch>
-  <param name="cerevoice_tts_node/startup_sentence" type="string" value="Text zu Sprache bereit." />
-  <rosparam param="voices" ns="cerevoice_tts_node" subst_value="true">
-  - path: $(env HOME)/cerevoice_sdk/voices/cerevoice_alex_3.0.6_22k.voice
-    license: $(env HOME)/cerevoice_sdk/voices/license.lic
-    abbrev: $(env HOME)/cerevoice_sdk/example_data/abbrev_german.txt
-  - path: $(env HOME)/cerevoice_sdk/voices/cerevoice_gudrun_3.0.6_22k.voice
-    license: $(env HOME)/cerevoice_sdk/voices/license.lic
-    abbrev: $(env HOME)/cerevoice_sdk/example_data/abbrev_german.txt
-  - path: $(env HOME)/cerevoice_sdk/voices/cerevoice_heather_3.0.8_22k.voice
-    license: $(env HOME)/cerevoice_sdk/voices/cereproc_license.lic
-    lexicon: $(env HOME)/cerevoice_sdk/example_data/additional.lex
-  </rosparam>
-  <node name="cerevoice_tts_node" pkg="cerevoice_tts" type="cerevoice_tts_node" respawn="false" output="screen" />
-</launch>
-```
+
+    <?xml version="1.0"?>
+    <launch>
+      <param name="cerevoice_tts_node/startup_sentence" type="string" value="Text zu Sprache bereit." />
+      <rosparam param="voices" ns="cerevoice_tts_node" subst_value="true">
+      - path: $(env HOME)/cerevoice_sdk/voices/cerevoice_alex_3.0.6_22k.voice
+        license: $(env HOME)/cerevoice_sdk/voices/license.lic
+        abbrev: $(env HOME)/cerevoice_sdk/example_data/abbrev_german.txt
+      - path: $(env HOME)/cerevoice_sdk/voices/cerevoice_gudrun_3.0.6_22k.voice
+        license: $(env HOME)/cerevoice_sdk/voices/license.lic
+        abbrev: $(env HOME)/cerevoice_sdk/example_data/abbrev_german.txt
+      - path: $(env HOME)/cerevoice_sdk/voices/cerevoice_heather_3.0.8_22k.voice
+        license: $(env HOME)/cerevoice_sdk/voices/cereproc_license.lic
+        lexicon: $(env HOME)/cerevoice_sdk/example_data/additional.lex
+      </rosparam>
+      <node name="cerevoice_tts_node" pkg="cerevoice_tts" type="cerevoice_tts_node" respawn="false" output="screen" />
+    </launch>
+
 
 The path and the license of a voice are required. Lexicon and abbreviations file are optional.
 The optional string startup_sentence will be synthesized when the TTS node is ready.
