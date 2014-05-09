@@ -36,7 +36,10 @@
 
 #include "ros/ros.h"
 
+#include <actionlib/client/simple_action_client.h>
+
 #include "cerevoice_tts/CerevoiceTts.h"
+#include "cerevoice_tts_msgs/TtsAction.h"
 
 int main(int argc, char **argv)
 {
@@ -47,6 +50,39 @@ int main(int argc, char **argv)
 
   if(!initialized)
     return EXIT_FAILURE;
+
+  ros::spinOnce();
+
+  ros::NodeHandle private_node_handle("~");
+  std::string startup_sentence;
+  private_node_handle.param("startup_sentence", startup_sentence, std::string(""));
+
+  if(!startup_sentence.empty())
+  {
+    ROS_INFO("Will now say the startup sentence '%s'", startup_sentence.c_str());
+    ROS_INFO("Will wait for server");
+
+    // Output this startup sentence
+    actionlib::SimpleActionClient<cerevoice_tts_msgs::TtsAction> action_client("TTS", true);
+    while(!action_client.isServerConnected())
+    {
+      ros::spinOnce();  // this looped spinning is required because we call an action from within the same node
+    }
+
+    ROS_INFO("Server ready");
+
+    cerevoice_tts_msgs::TtsGoal goal;
+    goal.text = startup_sentence;
+
+    action_client.sendGoal(goal);
+    while(!action_client.waitForResult(ros::Duration(0.0001)))
+    {
+      ros::spinOnce();
+    }
+
+    if(action_client.getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
+      ROS_ERROR("Synthesizing the startup sentence failed!");
+  }
 
   ros::spin();
 
