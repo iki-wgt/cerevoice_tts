@@ -111,10 +111,12 @@ bool CerevoiceTts::init()
       std::string path = xml_value[i]["path"];
       std::string license = xml_value[i]["license"];
       std::string lexicon = xml_value[i]["lexicon"];
+      std::string abbrev = xml_value[i]["abbrev"];
 
       ROS_DEBUG("voice no. %d: %s", i + 1, path.c_str());
       ROS_DEBUG("license no. %d: %s", i + 1, license.c_str());
       ROS_DEBUG("lexicon no. %d: %s", i + 1, lexicon.c_str());
+      ROS_DEBUG("abbrev no. %d: %s", i + 1, abbrev.c_str());
 
       if(path.empty())
       {
@@ -144,6 +146,16 @@ bool CerevoiceTts::init()
           ROS_ERROR("Could not load lexicon '%s'", lexicon.c_str());
         else
           ROS_INFO("Added lexicon '%s' to voice %s", lexicon.c_str(),
+              CPRCEN_engine_get_voice_info(engine_, voice_index, "VOICE_NAME"));
+
+      }
+
+      if(!abbrev.empty())
+      {
+        if(!CPRCEN_engine_load_user_abbreviations(engine_, voice_index, abbrev.c_str()))
+          ROS_ERROR("Could not load abbreviations file '%s'", abbrev.c_str());
+        else
+          ROS_INFO("Added abbreviations file '%s' to voice %s", abbrev.c_str(),
               CPRCEN_engine_get_voice_info(engine_, voice_index, "VOICE_NAME"));
 
       }

@@ -3,8 +3,10 @@
   <rosparam param="voices" ns="cerevoice_tts_node" subst_value="true">
   - path: $(env HOME)/cerevoice_sdk/voices/cerevoice_alex_3.0.6_22k.voice
     license: $(env HOME)/cerevoice_sdk/voices/license.lic
+    abbrev: $(env HOME)/cerevoice_sdk/example_data/abbrev_german.txt
   - path: $(env HOME)/cerevoice_sdk/voices/cerevoice_gudrun_3.0.6_22k.voice
     license: $(env HOME)/cerevoice_sdk/voices/license.lic
+    abbrev: $(env HOME)/cerevoice_sdk/example_data/abbrev_german.txt
   - path: $(env HOME)/cerevoice_sdk/voices/cerevoice_heather_3.0.8_22k.voice
     license: $(env HOME)/cerevoice_sdk/voices/cereproc_license.lic
     lexicon: $(env HOME)/cerevoice_sdk/example_data/additional.lex
