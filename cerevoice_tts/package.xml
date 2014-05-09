@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>cerevoice_tts</name>
-  <version>0.1.0</version>
+  <version>1.0.0</version>
   <description>The cerevoice_tts package uses the CereProc CereVoice TTS engine to synthesise speech.</description>
 
   <maintainer email="reineben@hs-weingarten.de">Benjamin Reiner</maintainer>

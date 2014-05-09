@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>cerevoice_tts_msgs</name>
-  <version>0.1.0</version>
+  <version>1.0.0</version>
   <description>The cerevoice_tts_msgs package defines an action to let the robot speak.</description>
 
   <maintainer email="reineben@hs-weingarten.de">Benjamin Reiner</maintainer>
