@@ -110,9 +110,11 @@ bool CerevoiceTts::init()
     {
       std::string path = xml_value[i]["path"];
       std::string license = xml_value[i]["license"];
+      std::string lexicon = xml_value[i]["lexicon"];
 
       ROS_DEBUG("voice no. %d: %s", i + 1, path.c_str());
       ROS_DEBUG("license no. %d: %s", i + 1, license.c_str());
+      ROS_DEBUG("lexicon no. %d: %s", i + 1, lexicon.c_str());
 
       if(path.empty())
       {
@@ -130,10 +132,21 @@ bool CerevoiceTts::init()
       success = CPRCEN_engine_load_voice(engine_, license.c_str(), NULL, path.c_str(), CPRC_VOICE_LOAD);
       if(!success)
       {
-        ROS_ERROR("Unable to load voice file %s!", path.c_str());
+        ROS_ERROR("Unable to load voice file '%s'!", path.c_str());
         return false;
       }
-      ROS_INFO("Loaded voice %s.", CPRCEN_engine_get_voice_info(engine_, i * -1 + xml_value.size() - 1, "VOICE_NAME"));
+      int voice_index = i * -1 + xml_value.size() - 1;
+      ROS_INFO("Loaded voice %s.", CPRCEN_engine_get_voice_info(engine_, voice_index, "VOICE_NAME"));
+
+      if(!lexicon.empty())
+      {
+        if(!CPRCEN_engine_load_user_lexicon(engine_, voice_index, lexicon.c_str()))
+          ROS_ERROR("Could not load lexicon '%s'", lexicon.c_str());
+        else
+          ROS_INFO("Added lexicon '%s' to voice %s", lexicon.c_str(),
+              CPRCEN_engine_get_voice_info(engine_, voice_index, "VOICE_NAME"));
+
+      }
     }
   }
   catch(XmlRpc::XmlRpcException &ex)
