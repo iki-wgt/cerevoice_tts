@@ -213,7 +213,11 @@ void CerevoiceTts::executeCB(const cerevoice_tts_msgs::TtsGoalConstPtr &goal)
   cerevoice_tts_msgs::TtsResult result;
   std::string xml = constructXml(goal->text, goal->voice);
 
-  ROS_INFO("Will now use voice %s synthesize the text: %s", goal->voice.c_str(), goal->text.c_str());
+  if(!goal->voice.empty())
+    ROS_INFO("Will now use voice %s to synthesize the text: %s", goal->voice.c_str(), goal->text.c_str());
+  else
+    ROS_INFO("Will now use the default voice to synthesize the text: %s", goal->text.c_str());
+
   // synthesize the text
   if(!CPRCEN_engine_channel_speak(engine_, channel_handle_, xml.c_str(), xml.length(), 0))  // 0 = do not flush
   {
