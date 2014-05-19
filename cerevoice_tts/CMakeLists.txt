@@ -13,7 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-find_package(ALSA REQUIRED)
 
 ###################################
 ## catkin specific configuration ##
@@ -28,7 +27,6 @@ catkin_package(
  INCLUDE_DIRS include
 #  LIBRARIES cerevoice_tts
  CATKIN_DEPENDS actionlib cerevoice_tts_msgs roscpp cerevoice_sdk
- DEPENDS ALSA
 )
 
 ###########

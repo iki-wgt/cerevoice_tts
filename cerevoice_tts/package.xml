@@ -12,8 +12,6 @@
 
   <author >Benjamin Reiner</author>
   
-  <!-- TODO: add somewhere the dependency to alsa -->
-  
   <test_depend>gtest</test_depend>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>actionlib</build_depend>
@@ -25,13 +23,4 @@
   <run_depend>roscpp</run_depend>
   <run_depend>cerevoice_sdk</run_depend>
 
-
-  <!-- The export tag contains other, unspecified, tags -->
-  <export>
-    <!-- You can specify that this package is a metapackage here: -->
-    <!-- <metapackage/> -->
-
-    <!-- Other tools can request additional information be placed here -->
-
-  </export>
 </package>
