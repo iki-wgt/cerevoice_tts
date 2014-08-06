@@ -19,9 +19,9 @@ add_action_files(
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
-  actionlib_msgs#   std_msgs
+  actionlib_msgs
 )
 
 catkin_package(
- CATKIN_DEPENDS actionlib_msgs message_runtime std_msgs #message_generation 
+ CATKIN_DEPENDS actionlib_msgs message_runtime std_msgs
 )

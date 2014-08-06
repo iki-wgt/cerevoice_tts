@@ -24,8 +24,6 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS include
-#  LIBRARIES cerevoice_tts
  CATKIN_DEPENDS actionlib cerevoice_tts_msgs roscpp cerevoice_sdk
 )
 
@@ -51,6 +49,17 @@ add_dependencies(cerevoice_tts_node cerevoice_tts_msgs_generate_messages_cpp)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(cerevoice_tts_node
   ${catkin_LIBRARIES}
+)
+
+#############
+## Install ##
+#############
+
+## Mark executables and/or libraries for installation
+install(TARGETS cerevoice_tts_node
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 #############
