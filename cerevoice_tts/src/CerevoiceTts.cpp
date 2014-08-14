@@ -34,6 +34,13 @@
 *     Author: Benjamin Reiner (reineben@hs-weingarten.de)
 *********************************************************************/
 
+#include <iostream>
+#include <fstream>
+#include <ctime>
+
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+
 #include "ros/ros.h"
 #include "XmlRpcException.h"
 #include "XmlRpcValue.h"
@@ -128,6 +135,42 @@ bool CerevoiceTts::init()
       {
         ROS_ERROR("Empty license path in list element %d!", i + 1);
         return false;
+      }
+
+      // search for license expiration date and print it if there's one
+      std::ifstream license_file(license.c_str());
+      std::string line;
+      if(license_file.is_open())
+      {
+        while(getline(license_file, line))
+        {
+          if(boost::algorithm::starts_with(line, "EXP="))
+          {
+            line = line.substr(std::string("EXP=").length());   // cut this string away
+            int year = boost::lexical_cast<int>(line.substr(0, 4));
+            int month = boost::lexical_cast<int>(line.substr(4, 2));
+            int day = boost::lexical_cast<int>(line.substr(6, 2));
+
+            struct std::tm expires = {0, 0, 0, day, month, year - 1900};
+            std::time_t now = time(0);
+            std::time_t expires_time = std::mktime(&expires);
+
+            int difference = static_cast<int>(std::difftime(expires_time, now) / (60 * 60 * 24));
+
+            if(difference < 50)
+              ROS_WARN("Your license expires in %d days on %d/%02d/%02d", difference, year, month, day);
+            else if(difference < 21)
+              ROS_ERROR("Your license expires in %d days on %d/%02d/%02d. Go buy a new one!", difference, year, month, day);
+            else
+              ROS_INFO("Your license expires in %d days on %d/%02d/%02d", difference, year, month, day);
+          }
+        }
+
+        license_file.close();
+      }
+      else
+      {
+        ROS_WARN("Can't open license file '%s", license.c_str());
       }
 
       // load this voice
