@@ -19,7 +19,9 @@ This repository contains ROS packages for the CereProc CereVoice TTS engine.
 ## Running
 ```$ roslaunch cerevoice_tts tts.launch ```
 
-You may have to modify the langua file information in the launch file.
+You may have to modify the language file information in the launch file.
+
+Always launch the node on the computer where the speakers are connected!
 
 ## Synthesizing text
 The text in the goal will be put in XML format, so feel free to use XML or SSML tags in your text.
