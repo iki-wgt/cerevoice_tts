@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <param name="cerevoice_tts_node/startup_sentence" type="string" value="Text zu Sprache bereit." />
+  <param name="cerevoice_tts_node/startup_sentence" type="string" value="" />
   <rosparam param="voices" ns="cerevoice_tts_node" subst_value="true">
   - path: $(find cerevoice_sdk)/voices/cerevoice_alex_3.0.6_22k.voice
     license: $(find cerevoice_sdk)/voices/license.lic
