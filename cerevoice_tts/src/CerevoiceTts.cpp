@@ -236,6 +236,8 @@ bool CerevoiceTts::init()
     ROS_ERROR("Unable to create player with sample rate %d Hz!", sample_rate);
     return false;
   }
+  else
+    ROS_DEBUG("Player created successfully.");
 
   // set the callback
   success = CPRCEN_engine_set_callback(engine_, channel_handle_, this, channelCallback);
@@ -244,9 +246,12 @@ bool CerevoiceTts::init()
     ROS_ERROR("Unable to set callback function!");
     return false;
   }
+  else
+    ROS_DEBUG("Callback set successfully.");
 
   // start the action server
   action_server_.start();
+  ROS_DEBUG("Action server started.");
 
   return true;
 }

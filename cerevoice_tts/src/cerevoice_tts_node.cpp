@@ -50,6 +50,8 @@ int main(int argc, char **argv)
 
   if(!initialized)
     return EXIT_FAILURE;
+  else
+	ROS_INFO("Cerevoice initialized successfully.");
 
   ros::spinOnce();
 
@@ -83,6 +85,8 @@ int main(int argc, char **argv)
     if(action_client.getState() != actionlib::SimpleClientGoalState::SUCCEEDED)
       ROS_ERROR("Synthesizing the startup sentence failed!");
   }
+  else
+	ROS_DEBUG("No startup sentence specified.");
 
   ros::spin();
 
