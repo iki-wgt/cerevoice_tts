@@ -1,0 +1,103 @@
+#!/usr/bin/env python
+######################################################################
+# Software License Agreement (BSD License)
+#
+#  Copyright (c) 2015, Hochschule Ravensburg-Weingarten
+#  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions
+#  are met:
+#
+#   * Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above
+#     copyright notice, this list of conditions and the following
+#     disclaimer in the documentation and/or other materials provided
+#     with the distribution.
+#   * Neither the name of the Willow Garage nor the names of its
+#     contributors may be used to endorse or promote products derived
+#     from this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+#  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+#  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+#  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+#  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+#  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#  POSSIBILITY OF SUCH DAMAGE.
+#
+#     Author: Benjamin Reiner (reineben@hs-weingarten.de)
+######################################################################
+
+"""
+CLI tool to easily say text from a text file.
+"""
+
+import argparse
+
+import rospy
+import actionlib
+
+from cerevoice_tts_msgs.msg import TtsAction, TtsGoal
+
+client = None
+finished = True
+
+def get_argument_parser():
+    """Small helper to parse the arguments. Stolen from 
+    https://github.com/clearpathrobotics/robot_upstart/blob/empy/src/robot_upstart/install_script.py"""
+    p = argparse.ArgumentParser(
+        description=
+        """Use this tool to quickly and easily let your robot say text from a text file.""")
+
+    p.add_argument("file_path", type=str, nargs=1, metavar=("path/file",),
+                   help="Path to the text file. ")
+    p.add_argument("--voice", type=str, metavar="Alex",
+                   help="Name of the voice to be used.")
+    return p
+
+def shutdown_hook():
+    """Shutdown hook that cancels the current goal"""
+    if not finished:    # only in case a Ctrl + C occured
+        print "Shutdown requested! Canceling goal."
+        client.cancel_goal()
+        rospy.sleep(0.2)    # to ensure that the message gets published, yet there is no absolute guarantee
+
+if __name__ == "__main__":
+    rospy.init_node('txt2speech')
+
+    rospy.on_shutdown(shutdown_hook)   # register a shutdown hook to cancel the goal when a Ctrl + C occurs
+    
+    args = get_argument_parser().parse_args()
+    
+    finished = False    # Set it not to False because parse_args() shuts down the node in an error case
+    
+    client = actionlib.SimpleActionClient('TTS', TtsAction)
+    client.wait_for_server()
+    goal = TtsGoal(voice=args.voice)
+    
+    text = ''
+    with open(args.file_path[0], 'r') as txt_file:
+        text = txt_file.read()
+    goal.text = text
+    
+    rospy.loginfo('Saying \"' + goal.text + '\"')
+    
+    client.send_goal(goal)
+    rospy.logdebug('Sent goal.')
+    
+    rospy.logdebug('Waiting for result.')
+    while client.get_state() == actionlib.GoalStatus.PENDING:   
+        # this is necessary because the goal does not always get the state ACTIVE immediately
+        rospy.sleep(0.005)
+    
+    while client.get_state() == actionlib.GoalStatus.ACTIVE:
+        rospy.sleep(0.005)
+
+    finished = True

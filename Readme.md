@@ -71,3 +71,15 @@ Example:
 
 The path and the license of a voice are required. Lexicon and abbreviations file are optional.
 The optional string startup_sentence will be synthesized when the TTS node is ready.
+
+## Scripts
+
+### txt2speech
+
+To test text you can use the script txt2speech. It takes as an argument the path to a text file. This text will be synthesised.
+
+    usage: txt2speech [-h] [--voice Alex] path/file
+
+Examples:
+    $ rosrun cerevoice_tts txt2speech text.txt
+    $ rosrun cerevoice_tts txt2speech.py --voice=Alex text.txt
