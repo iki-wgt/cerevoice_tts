@@ -151,7 +151,7 @@ bool CerevoiceTts::init()
             int month = boost::lexical_cast<int>(line.substr(4, 2));
             int day = boost::lexical_cast<int>(line.substr(6, 2));
 
-            struct std::tm expires = {0, 0, 0, day, month, year - 1900};
+            struct std::tm expires = {0, 0, 0, day, month - 1, year - 1900};
             std::time_t now = time(0);
             std::time_t expires_time = std::mktime(&expires);
 
