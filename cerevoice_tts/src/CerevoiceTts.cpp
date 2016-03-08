@@ -255,6 +255,7 @@ bool CerevoiceTts::init()
 
 void CerevoiceTts::executeCB(const cerevoice_tts_msgs::TtsGoalConstPtr &goal)
 {
+  const int FLUSH_BUFFER = 1;
   cerevoice_tts_msgs::TtsResult result;
   std::string xml = constructXml(goal->text, goal->voice);
 
@@ -264,16 +265,7 @@ void CerevoiceTts::executeCB(const cerevoice_tts_msgs::TtsGoalConstPtr &goal)
     ROS_INFO("Will now use the default voice to synthesize the text: %s", goal->text.c_str());
 
   // synthesize the text
-  if(!CPRCEN_engine_channel_speak(engine_, channel_handle_, xml.c_str(), xml.length(), 0))  // 0 = do not flush
-  {
-    ROS_ERROR("The speak method returned an error!");
-    action_server_.setAborted();
-    return;
-  }
-
-
-  // Finished processing, flush the buffer with empty input
-  if(!CPRCEN_engine_channel_speak(engine_, channel_handle_, "", 0, 1))
+  if(!CPRCEN_engine_channel_speak(engine_, channel_handle_, xml.c_str(), xml.length(), FLUSH_BUFFER))
   {
     ROS_ERROR("The speak method returned an error!");
     action_server_.setAborted();
