@@ -72,24 +72,27 @@ void CerevoiceTts::channelCallback(CPRC_abuf * audio_buffer, void * user_data)
 {
   CerevoiceTts *tts_object = static_cast<CerevoiceTts *>(user_data);
 
-  // Transcription buffer, holds information on phone timings, markers etc.
-  const CPRC_abuf_trans * transcription_buffer = NULL;
-  CPRC_sc_audio * audio_sound_cue = NULL;
-  int wav_mk, wav_done;
-
-  wav_mk = CPRC_abuf_wav_mk(audio_buffer);
-  wav_done = CPRC_abuf_wav_done(audio_buffer);
-  if (wav_mk < 0) wav_mk = 0;
-  if (wav_done < 0) wav_done = 0;
-
-  if(tts_object->player_)
+  if(tts_object->action_server_.isActive())
   {
-    audio_sound_cue = CPRC_sc_audio_short_disposable(CPRC_abuf_wav_data(audio_buffer) + wav_mk, wav_done - wav_mk);
-    CPRC_sc_audio_cue(tts_object->player_, audio_sound_cue);
-  }
-  else
-  {
-    ROS_ERROR("Can't play audio! Pointer to player is NULL!");
+    // Transcription buffer, holds information on phone timings, markers etc.
+    const CPRC_abuf_trans * transcription_buffer = NULL;
+    CPRC_sc_audio * audio_sound_cue = NULL;
+    int wav_mk, wav_done;
+
+    wav_mk = CPRC_abuf_wav_mk(audio_buffer);
+    wav_done = CPRC_abuf_wav_done(audio_buffer);
+    if (wav_mk < 0) wav_mk = 0;
+    if (wav_done < 0) wav_done = 0;
+
+    if(tts_object->player_)
+    {
+      audio_sound_cue = CPRC_sc_audio_short_disposable(CPRC_abuf_wav_data(audio_buffer) + wav_mk, wav_done - wav_mk);
+      CPRC_sc_audio_cue(tts_object->player_, audio_sound_cue);
+    }
+    else
+    {
+      ROS_ERROR("Can't play audio! Pointer to player is NULL!");
+    }
   }
 }
 
@@ -298,11 +301,11 @@ void CerevoiceTts::preemptCB()
 
     if(ret == 0)
       ROS_ERROR("Player can't be stopped!");
-
-    action_server_.setPreempted();
   }
   else
     ROS_ERROR("Player is NULL!");
+
+  action_server_.setPreempted();
 }
 
 std::string CerevoiceTts::constructXml(std::string text, std::string voice)
