@@ -5,6 +5,7 @@
   - path: $(find cerevoice_sdk)/voices/cerevoice_alex_3.0.6_22k.voice
     license: $(find cerevoice_sdk)/voices/license.lic
     abbrev: $(find cerevoice_sdk)/example_data/abbrev_german.txt
+    lexicon: $(find cerevoice_sdk)/example_data/german.lex
   - path: $(find cerevoice_sdk)/voices/cerevoice_gudrun_3.0.6_22k.voice
     license: $(find cerevoice_sdk)/voices/license.lic
     abbrev: $(find cerevoice_sdk)/example_data/abbrev_german.txt
