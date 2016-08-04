@@ -1,6 +1,6 @@
 # CereVoice Text-To-Speech repository
 
-This repository contains ROS packages for the CereProc CereVoice TTS engine.
+This repository contains ROS packages for the CereProc CereVoice TTS engine. It is useless without the CereVoice SDK and a valid license. To get CereVoice please visit www.cereproc.com.
 
 ## Installation
 
@@ -120,3 +120,7 @@ Examples:
 
     $ rosrun cerevoice_tts txt2speech text.txt
     $ rosrun cerevoice_tts txt2speech.py --voice=Alex text.txt
+
+## Disclaimer
+
+This software has been developed by the Ravensburg-Weingarten Institute of Artificial Intelligence and not by CereProc. It has been published with kind permission of CereProc.
