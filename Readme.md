@@ -4,17 +4,49 @@ This repository contains ROS packages for the CereProc CereVoice TTS engine.
 
 ## Installation
 
-0.0 [Install ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu) if you haven't already.
-0.1 [Create a Catkin workspace](http://wiki.ros.org/catkin/Tutorials/create_a_workspace) if you don't already have one.
+To use this package you have to create a package for the CereVoice SDK you got from CereProc. Put all folders and files from the SDK in this package. The ```CMakeLists.txt``` has to look like this:
 
-1.  Clone the CereVoice SDK:
-    git clone git@141.69.58.11:various/cerevoice_sdk.git
+```CMake
+cmake_minimum_required(VERSION 2.8.3)
+project(cerevoice_sdk)
 
-2.  Clone this repository:
+find_package(catkin REQUIRED)
+find_package(ALSA REQUIRED)
 
-    $ cd ~/catkin_ws/src
-    $ git clone git@141.69.58.11:ros/cerevoice_tts.git
-    $ catkin_make
+find_library(ENG_LIB
+  NAMES cerevoice_eng_shared
+  PATHS cerevoice_eng/lib)
+
+find_library(PMOD_LIB
+  NAMES cerevoice_pmod_shared
+  PATHS cerevoice_pmod/lib)
+
+find_library(CEREHTS_LIB
+  NAMES cerehts_shared
+  PATHS cerehts/lib)
+
+find_library(CEREVOICE_LIB
+  NAMES cerevoice_shared
+  PATHS cerevoice/lib)
+
+find_library(AUD_LIB
+  NAMES cerevoice_aud_shared
+  PATHS cerevoice_aud/lib)
+
+catkin_package(
+  INCLUDE_DIRS cerevoice_eng/include cerevoice_aud/include
+  LIBRARIES
+  ${ENG_LIB}
+  ${PMOD_LIB}
+  ${CEREHTS_LIB}
+  ${CEREVOICE_LIB}
+  ${AUD_LIB}
+
+  DEPENDS ALSA
+)
+```
+
+In the ```package.xml``` depend on ```libasound2-dev```.
 
 ## Running
 
